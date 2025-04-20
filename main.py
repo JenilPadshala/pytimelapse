@@ -7,6 +7,11 @@ import sys
 import platform
 import argparse
 import os
+import time
+
+# Import camera classes and factory function
+from camera import MacCamera, PiCamera, CameraError, get_camera
+
 
 def get_operating_system():
     """Detect the underlying operating system."""
@@ -61,12 +66,37 @@ def main():
     if current_os == "unsupported":
         print(f"Error: Unsupported operating system '{sys.platform}'. Exiting.")
         sys.exit(1)
-    
-    if current_os == "linux":
-        print("Linux platform detected. RPI - spcific implementation will be added later.")
-
     # 3. Initialize camera based on platform
-    # 4. Start timelapse loop
+    camera = None
+    try:
+        camera_config = {}
+        camera = get_camera(os_type=current_os, config=camera_config)
+
+        with camera:
+            print("Camera initialized successfully. (Placeholder)")
+            # 4. Start timelapse loop
+            print("Starting capture loop (Placeholder - 1 capture)")
+            try:
+                os.makedirs(args.output, exist_ok=True)
+                print(f"Output directory '{args.output}' ensured.")
+            except OSError as e:
+                print(f"Error creating output directory '{args.output}': {e}")
+                raise CameraError(f"Cannot create output directory: {e}") from e
+            filename = os.path.join(args.output, "placeholder_capture_00001.jpg")
+            camera.capture_image(filename)
+            time.sleep(1)
+    
+    except CameraError as e:
+        print(f"Camera error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        if camera:
+            camera.shutdown()
+        sys.exit(1)
+    finally:
+        print("Camera shutdown sequence completed.")
+
     # 5. Cleanup
     # --- End Placeholder ---
     print("PyTimelapse finished (Placeholder).")
