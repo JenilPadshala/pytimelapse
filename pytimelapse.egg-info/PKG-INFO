@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: pytimelapse
+Version: 0.1.0
+Summary: Python Time-lapse project
+Author-email: Jenil Padshala <twilightcoding@gmail.com>
+Requires-Python: >=3.8
+Requires-Dist: exceptiongroup==1.2.2
+Requires-Dist: iniconfig==2.1.0
+Requires-Dist: packaging==25.0
+Requires-Dist: pluggy==1.5.0
+Requires-Dist: pytest==8.3.5
+Requires-Dist: tomli==2.2.1
