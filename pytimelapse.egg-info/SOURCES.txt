@@ -1,9 +1,0 @@
-README.md
-pyproject.toml
-pytimelapse/__init__.py
-pytimelapse.egg-info/PKG-INFO
-pytimelapse.egg-info/SOURCES.txt
-pytimelapse.egg-info/dependency_links.txt
-pytimelapse.egg-info/requires.txt
-pytimelapse.egg-info/top_level.txt
-tests/test_main.py
