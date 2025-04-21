@@ -1,5 +1,9 @@
 # PyTimelapse
 
+PyTimelapse is a powerful, user-friendly Python application for creating high-quality timelapses with minimal setup. This tool allows you to capture image sequences at configurable intervals on macOS (with full support for built-in and USB webcams) and has planned support for Raspberry Pi cameras. 
+
+Featuring a clean command-line interface with intuitive parameters, PyTimelapse makes it easy to customize your capture process. When your timelapse sequence is complete, PyTimelapse can automatically compile the images into a polished video using ffmpeg. The project leverages modern Python tooling with `uv` package manager support for simple installation and dependency management.
+
 A cross-platform Python script for capturing timelapse image sequences on macOS and (planned) Raspberry Pi, with an option to compile the sequence into a video using ffmpeg.
 
 ## Features

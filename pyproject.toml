@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pytimelapse"
 version = "0.1.0"
-description = "Python Time-lapse project"
+description = "A cross-platform Python timelapse capture application with configurable intervals, supporting macOS (and planned Raspberry Pi), with optional video compilation via ffmpeg"
 authors = [
     {name = "Jenil Padshala", email = "twilightcoding@gmail.com"},
 ]
