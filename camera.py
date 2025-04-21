@@ -81,7 +81,6 @@ class MacCamera(CameraBase):
                 frame_count += 1
                 if not ret:
                     print("MacCamera: Warning - Frame drop during warm-up.")
-                time.sleep(0.01)
             print(f"MacCamera: Warm-up complete. Read {frame_count} frames in {time.time() - start_time:.2f} seconds.")
             # --- End warm-up delay ---    
             print(f"MacCamera: Camera {self.camera_index} initialized successfully.")

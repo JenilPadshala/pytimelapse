@@ -8,6 +8,7 @@ import platform
 import argparse
 import os
 import time
+import datetime
 
 # Import camera classes and factory function
 from camera import MacCamera, PiCamera, CameraError, get_camera
@@ -59,6 +60,11 @@ def main():
     print(f" Output Directory: {args.output}")
     print(f" Image Limit: {'No limit' if args.limit == 0 else args.limit}")
 
+    # validate interval
+    if args.interval <= 0:
+        print("Error: Interval must be positive.")
+        sys.exit(1)
+    
     # 2. Detect platform
     current_os = get_operating_system()
     print(f"Detected operating system: {current_os}")
@@ -68,39 +74,81 @@ def main():
         sys.exit(1)
     # 3. Initialize camera based on platform
     camera = None
+    images_captured = 0
+    start_time = time.monotonic() 
     try:
+        # Ensuring output directory exists
+        try: 
+            print(f"Ensuring output directory '{args.output}' exists...")
+            os.makedirs(args.output, exist_ok=True)
+        except OSError as e:
+            print(f"Error creating output directory '{args.output}': {e}")
+            sys.exit(1)
+        
+        # Initialize camera
+        print("Initializing camera...")
         camera_config = {}
         camera = get_camera(os_type=current_os, config=camera_config)
 
+        # use context manager for automatic setup/teardown
         with camera:
-            print("Camera initialized successfully. (Placeholder)")
-            # 4. Start timelapse loop
-            print("Starting capture loop (Placeholder - 1 capture)")
-            try:
-                os.makedirs(args.output, exist_ok=True)
-                print(f"Output directory '{args.output}' ensured.")
-            except OSError as e:
-                print(f"Error creating output directory '{args.output}': {e}")
-                raise CameraError(f"Cannot create output directory: {e}") from e
-            filename = os.path.join(args.output, "placeholder_capture_00001.jpg")
-            camera.capture_image(filename)
-            time.sleep(1)
+            print("Camera initialized successfully. Starting timelapse capture...")
+            print(f"Press Ctrl+C to stop the capture early.")
+
+            # Start timelapse loop
+            capture_count = 0
+            while True:
+                if args.limit > 0 and capture_count >= args.limit:
+                    print(f"\nReached image limit ({args.limit}). Stopping capture.")
+                    break
+
+                image_number = capture_count + 1
+                filename = f"image_{image_number:05d}.jpg"
+                filepath = os.path.join(args.output, filename)
+
+                # capture the image
+                try:
+                    print(f"Capturing image {image_number}{f'/{args.limit}' if args.limit > 0 else ''} to {filepath}...")
+                    success = camera.capture_image(filepath)
+                    if success:
+                        capture_count +=1
+                        images_captured += 1
+                    else:
+                        print(f"Warning: Capture attempt for {filepath} reported failure but didn't raise error.")
+                except CameraError as e:
+                    print(f"\nError during capture for {filepath}: {e}")
+                    print("Attempting to continue capture...")
+                    time.sleep(args.interval)
+                    continue
+
+                # Wait for the next interval
+                if args.limit > 0 and capture_count >= args.limit:
+                    print(f"\nReached image limit ({args.limit}). Stopping capture.")
+                    break
+
+                print(f"Waiting for {args.interval} seconds before next capture...")
+                try:
+                    time.sleep(args.interval)
+                except KeyboardInterrupt:
+                    print("\nStopping loop due to Ctrl+C.")
+                    break
     
     except CameraError as e:
-        print(f"Camera error: {e}")
+        print(f"\nCritical Camera Error during setup or loop: {e}")
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nCapture interrupted by user (Ctrl+C).")
+    
     except Exception as e:
-        print(f"Unexpected error: {e}")
-        if camera:
-            camera.shutdown()
-        sys.exit(1)
+        print(f"\nAn unexpected error occurred: {type(e).__name__}: {e}")
     finally:
-        print("Camera shutdown sequence completed.")
-
-    # 5. Cleanup
-    # --- End Placeholder ---
-    print("PyTimelapse finished (Placeholder).")
+        end_time = time.monotonic()
+        duration = end_time - start_time
+        print("-" * 30)
+        print("PyTimelapse finished.")
+        print(f"Total images captured: {images_captured}")
+        print(f"Total duration: {datetime.timedelta(seconds=duration)}")
+        print("-" * 30)
 
 if __name__ == "__main__":
-
     main()
