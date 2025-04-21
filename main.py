@@ -13,6 +13,8 @@ import datetime
 # Import camera classes and factory function
 from camera import MacCamera, PiCamera, CameraError, get_camera
 
+# Import video compilation util
+from video_utils import compile_video_ffmpeg
 
 def get_operating_system():
     """Detect the underlying operating system."""
@@ -46,6 +48,25 @@ def parse_arguments():
         default = 0,
         help = "Maximum number of images to capture (default: 0 for unlimited)"
     )
+    # video compilation arguments
+    parser.add_argument(
+        "--compile-video",
+        action="store_true", # makes it a flag, True if present
+        help="Compile captured images into a video after capture finishes (requires ffmpeg)."
+    )
+    parser.add_argument(
+        "--fps",
+        type=int,
+        default=24,
+        help="Framerate(frames per second) for the compiled video (default: 24)."
+    )
+    parser.add_argument(
+        "--video-filename",
+        type=str,
+        default="timelapse.mp4",
+        help="Filename for the compiled video (default: timeplapse.mp4)."
+    )
+
     args = parser.parse_args()
     return args
 
@@ -149,6 +170,23 @@ def main():
         print(f"Total images captured: {images_captured}")
         print(f"Total duration: {datetime.timedelta(seconds=duration)}")
         print("-" * 30)
+        
+        # --- Call video compilation if requested ---
+        if args.compile_video and images_captured > 0:
+            print("\nVideo compilation requested.")
+            # Define the image pattern based on how files were saved
+            image_pattern = "image_%05d.jpg" # Matches f"image_{image_number:05d}.jpg"
+            # Construct the full output video path (can be relative or absolute)
+            video_output_path = os.path.join(args.output, args.video_filename)
+
+            compile_video_ffmpeg(
+                image_folder=args.output,
+                image_pattern=image_pattern,
+                output_filename=video_output_path,
+                fps=args.fps
+            )
+        elif args.compile_video and images_captured == 0:
+             print("\nVideo compilation skipped: No images were captured.")
 
 if __name__ == "__main__":
     main()
