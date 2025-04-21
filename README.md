@@ -85,3 +85,13 @@ Run the script from the project's root directory using `python main.py`.
 ```bash
 python main.py -l 50 -i 5 -o my_timelapse_pics
 ```
+
+## License
+
+PyTimelapse is open-source software licensed under the [MIT License](LICENSE). This means you are free to:
+
+- Use the software for commercial and private purposes
+- Modify and distribute the source code
+- Create derivative works
+
+The only requirement is that you include the original copyright notice and license in any copy of the software or substantial portion of it.
