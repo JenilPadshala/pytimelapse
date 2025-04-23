@@ -1,11 +1,12 @@
 import subprocess
 import shutil
 import os
-import platform
+
 
 def check_ffmpeg():
     """Checks if ffmpeg command exists in the system PATH."""
     return shutil.which("ffmpeg") is not None
+
 
 def compile_video_ffmpeg(image_folder, image_pattern, output_filename, fps):
     """
@@ -23,34 +24,44 @@ def compile_video_ffmpeg(image_folder, image_pattern, output_filename, fps):
 
     if not check_ffmpeg():
         print("Error: ffmpeg command not found. Cannot compile video.")
-        print("Please install ffmpeg (e.g., 'brew install ffmpeg' or 'sudo apt install ffmpeg').")
+        print(
+            "Please install ffmpeg (e.g., 'brew install ffmpeg' or 'sudo apt install ffmpeg')."
+        )
         return False
-    
-    print(f"\nAttempting to compile video using ffmpeg...")
+
+    print("\nAttempting to compile video using ffmpeg...")
     print(f"  Image Source: {os.path.join(image_folder, image_pattern)}")
     print(f"  Output Video: {output_filename}")
-    print(f"  Framerate: {fps}")   
+    print(f"  Framerate: {fps}")
 
     # Ensure output directory exists for the video file
     video_output_dir = os.path.dirname(output_filename)
     if video_output_dir and not os.path.exists(video_output_dir):
-         try:
-             os.makedirs(video_output_dir)
-             print(f"Created directory for video output: {video_output_dir}")
-         except OSError as e:
-             print(f"Error creating directory for video output '{video_output_dir}': {e}")
-             return False
-        
+        try:
+            os.makedirs(video_output_dir)
+            print(f"Created directory for video output: {video_output_dir}")
+        except OSError as e:
+            print(
+                f"Error creating directory for video output '{video_output_dir}': {e}"
+            )
+            return False
+
     command = [
-        'ffmpeg',
-        '-y',
-        '-framerate', str(fps),
-        '-i', os.path.join(image_folder, image_pattern), # Input pattern
-        '-c:v', 'libx264',      # Video codec H.264 (widely compatible)
-        '-pix_fmt', 'yuv420p',  # Pixel format for compatibility
-        '-crf', '23',           # Constant Rate Factor (lower means better quality, 18-28 is common range)
-        '-preset', 'medium',    # Encoding speed vs compression (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow)
-        output_filename         # Output file path
+        "ffmpeg",
+        "-y",
+        "-framerate",
+        str(fps),
+        "-i",
+        os.path.join(image_folder, image_pattern),  # Input pattern
+        "-c:v",
+        "libx264",  # Video codec H.264 (widely compatible)
+        "-pix_fmt",
+        "yuv420p",  # Pixel format for compatibility
+        "-crf",
+        "23",  # Constant Rate Factor (lower means better quality, 18-28 is common range)
+        "-preset",
+        "medium",  # Encoding speed vs compression (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow)
+        output_filename,  # Output file path
     ]
 
     print(f"Running command: {' '.join(command)}")
@@ -64,10 +75,12 @@ def compile_video_ffmpeg(image_folder, image_pattern, output_filename, fps):
             print(result.stdout)
         if result.stderr:
             print("\n--- ffmpeg stderr ---")
-            print(result.stderr) # Print errors or progress info
+            print(result.stderr)  # Print errors or progress info
 
         if result.returncode != 0:
-            print(f"\nError: ffmpeg compilation failed with return code {result.returncode}.")
+            print(
+                f"\nError: ffmpeg compilation failed with return code {result.returncode}."
+            )
             return False
         else:
             print(f"\nVideo compilation successful: {output_filename}")
